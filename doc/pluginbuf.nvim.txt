@@ -1,0 +1,35 @@
+*pluginbuf.nvim.txt*
+
+==============================================================================
+Lua module: pluginbuf                               *pluginbuf.nvim-pluginbuf*
+
+register({scheme_name}, {opts})                         *pluginbuf.register()*
+  Registers scheme handler.
+
+  Parameters: ~
+    {scheme_name} (string) TODO
+    {opts} (PluginbufRegisterOption?) |PluginbufRegisterOption|
+
+==============================================================================
+STRUCTURE                                           *pluginbuf.nvim-STRUCTURE*
+
+PluginbufRegisterOption                              *PluginbufRegisterOption*
+
+- {read} (fun()?) TODO
+- {write} (fun()?) TODO
+
+==============================================================================
+EXAMPLES                                             *pluginbuf.nvim-EXAMPLES*
+
+>
+  local util = require("pluginbuf.util")
+  require("pluginbuf").register("gh-repo-description", {
+    read = util.cmd_output({ "gh", "repo", "view", "--json=description", "--jq=.description" }),
+    write = util.cmd_input({ "gh", "repo", "edit", "--description", "-" }),
+  })
+  vim.cmd.tabedit("gh-repo-description://[Scratch]")
+
+<
+
+==============================================================================
+vim:tw=78:ts=8:ft=help
