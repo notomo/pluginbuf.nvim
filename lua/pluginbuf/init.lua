@@ -1,14 +1,15 @@
 local M = {}
 
---- @class PluginbufRegisterOption
---- @field read fun()? TODO
---- @field write fun()? TODO
+--- @class PluginbufRouteDefinition
+--- @field path string TODO
+--- @field read fun(ctx)? TODO
+--- @field write fun(ctx)? TODO
 
 --- Registers scheme handler.
 --- @param scheme_name string TODO
---- @param opts PluginbufRegisterOption? |PluginbufRegisterOption|
-function M.register(scheme_name, opts)
-  require("pluginbuf.command").register(scheme_name, opts)
+--- @param route_definitions PluginbufRouteDefinition[] |PluginbufRouteDefinition|
+function M.register(scheme_name, route_definitions)
+  require("pluginbuf.command").register(scheme_name, route_definitions)
 end
 
 return M

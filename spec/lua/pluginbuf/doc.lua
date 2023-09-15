@@ -48,8 +48,7 @@ Inspired by [vim-metarw](https://github.com/kana/vim-metarw).
 ## Example
 
 ```lua
-%s
-```]]):format(full_plugin_name, example)
+%s```]]):format(full_plugin_name, example)
 
   local readme = io.open("README.md", "w")
   readme:write(content)

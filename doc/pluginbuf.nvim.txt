@@ -3,20 +3,21 @@
 ==============================================================================
 Lua module: pluginbuf                               *pluginbuf.nvim-pluginbuf*
 
-register({scheme_name}, {opts})                         *pluginbuf.register()*
+register({scheme_name}, {route_definitions})            *pluginbuf.register()*
   Registers scheme handler.
 
   Parameters: ~
     {scheme_name} (string) TODO
-    {opts} (PluginbufRegisterOption?) |PluginbufRegisterOption|
+    {route_definitions} (PluginbufRouteDefinition[]) |PluginbufRouteDefinition|
 
 ==============================================================================
 STRUCTURE                                           *pluginbuf.nvim-STRUCTURE*
 
-PluginbufRegisterOption                              *PluginbufRegisterOption*
+PluginbufRouteDefinition                            *PluginbufRouteDefinition*
 
-- {read} (fun()?) TODO
-- {write} (fun()?) TODO
+- {path} (string) TODO
+- {read} (fun(ctx)?) TODO
+- {write} (fun(ctx)?) TODO
 
 ==============================================================================
 EXAMPLES                                             *pluginbuf.nvim-EXAMPLES*
@@ -24,10 +25,19 @@ EXAMPLES                                             *pluginbuf.nvim-EXAMPLES*
 >
   local util = require("pluginbuf.util")
   require("pluginbuf").register("gh-repo-description", {
-    read = util.cmd_output({ "gh", "repo", "view", "--json=description", "--jq=.description" }),
-    write = util.cmd_input({ "gh", "repo", "edit", "--description", "-" }),
+    {
+      path = "/{owner}/{repo}",
+      read = function(ctx)
+        local onwer_repo = ctx.path_params.owner .. "/" .. ctx.path_params.repo
+        return util.cmd_output({ "gh", "repo", "view", onwer_repo, "--json=description", "--jq=.description" })(ctx)
+      end,
+      write = function(ctx)
+        local onwer_repo = ctx.path_params.owner .. "/" .. ctx.path_params.repo
+        return util.cmd_input({ "gh", "repo", "edit", onwer_repo, "--description", "-" })(ctx)
+      end,
+    },
   })
-  vim.cmd.tabedit("gh-repo-description://[Scratch]")
+  vim.cmd.tabedit("gh-repo-description://notomo/pluginbuf.nvim")
 
 <
 

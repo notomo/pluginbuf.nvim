@@ -6,6 +6,12 @@ describe("pluginbuf.register()", function()
   after_each(helper.after_each)
 
   it("TODO", function()
-    pluginbuf.register("pluginbuf")
+    pluginbuf.register("pluginbuf", {
+      {
+        read = function() end,
+        write = function() end,
+        path = "{test1}/{test2}",
+      },
+    })
   end)
 end)
