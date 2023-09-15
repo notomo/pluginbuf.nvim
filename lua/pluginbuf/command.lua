@@ -12,7 +12,8 @@ function M.register(scheme_name, raw_opts)
       pattern = pattern,
       callback = function(args)
         local bufnr = tonumber(args.buf)
-        local ctx = require("pluginbuf.core.context").new_read_context(bufnr)
+        local ctx =
+          require("pluginbuf.core.context").new_read_context(scheme_name, bufnr, opts.path_parameter_definitions)
         opts.read(ctx)
       end,
     })
@@ -24,7 +25,8 @@ function M.register(scheme_name, raw_opts)
       pattern = pattern,
       callback = function(args)
         local bufnr = tonumber(args.buf)
-        local ctx = require("pluginbuf.core.context").new_write_context(bufnr)
+        local ctx =
+          require("pluginbuf.core.context").new_write_context(scheme_name, bufnr, opts.path_parameter_definitions)
         return opts.write(ctx)
       end,
     })
