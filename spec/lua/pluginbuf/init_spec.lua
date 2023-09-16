@@ -79,4 +79,20 @@ line2$]])
       param2 = "test2",
     }, path_params)
   end)
+
+  it("can use autocmd arguments", function()
+    local autocmd_args
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/",
+        read = function(ctx)
+          autocmd_args = ctx.autocmd_args
+        end,
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test://test")
+
+    assert.equals(vim.fn.bufnr("%"), autocmd_args.buf)
+  end)
 end)

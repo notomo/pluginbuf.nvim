@@ -14,9 +14,10 @@ local mapping = {
   write = WriteContext,
   source = SourceContext,
 }
-function M.new_context(handler_type, bufnr, route)
+function M.new_context(handler_type, bufnr, route, autocmd_args)
   local tbl = {
     path_params = route.path_params,
+    autocmd_args = autocmd_args,
     _bufnr = bufnr,
   }
   return setmetatable(tbl, mapping[handler_type])

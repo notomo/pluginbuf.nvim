@@ -8,15 +8,15 @@ local register_one = function(handler_type, route_definitions, event, group, pat
   vim.api.nvim_create_autocmd({ event }, {
     group = group,
     pattern = pattern,
-    callback = function(args)
-      local bufnr = tonumber(args.buf)
+    callback = function(autocmd_args)
+      local bufnr = tonumber(autocmd_args.buf)
 
       local route, err = route_definitions:find(bufnr, handler_type)
       if err then
         error(err)
       end
 
-      local ctx = require("pluginbuf.core.context").new_context(handler_type, bufnr, route)
+      local ctx = require("pluginbuf.core.context").new_context(handler_type, bufnr, route, autocmd_args)
 
       local handler = route[handler_type]
       handler(ctx)
