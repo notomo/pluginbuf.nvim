@@ -35,7 +35,7 @@ function RouteDefinition.match(self, path_elements, enabled_type)
   local path_params = {}
   for i, e in ipairs(path_elements) do
     local definition = self._path_definitions[i]
-    if not definition.is_variable and definition.name == e then
+    if not definition.is_variable and definition.name ~= e then
       return nil
     end
     if definition.is_variable then
