@@ -4,6 +4,7 @@ local M = {}
 --- @field path string TODO
 --- @field read fun(ctx)? TODO
 --- @field write fun(ctx)? TODO
+--- @field source fun(ctx)? TODO
 
 --- Registers scheme handler.
 --- @param scheme_name string TODO

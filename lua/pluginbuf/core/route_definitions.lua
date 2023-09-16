@@ -4,6 +4,7 @@ function Route.new(raw_route, path_params)
   return {
     read = raw_route.read,
     write = raw_route.write,
+    source = raw_route.source,
     path_params = path_params,
   }
 end
@@ -17,6 +18,7 @@ function RouteDefinition.new(raw_route)
     _enabled_types = {
       read = raw_route.read ~= nil,
       write = raw_route.write ~= nil,
+      source = raw_route.source ~= nil,
     },
     _raw_route = raw_route,
   }

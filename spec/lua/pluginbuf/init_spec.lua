@@ -44,6 +44,23 @@ line2$]])
     assert.is_false(vim.bo.modified)
   end)
 
+  it("can custom buffer sourcing", function()
+    local called = false
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/",
+        source = function(_)
+          called = true
+        end,
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test://test")
+    vim.cmd.source("%")
+
+    assert.is_true(called)
+  end)
+
   it("can use path parameter", function()
     local path_params
     pluginbuf.register("pluginbuf-test", {

@@ -41,6 +41,24 @@ function M.register(scheme_name, raw_route_definitions)
       end,
     })
   end
+
+  if route_definitions:has("source") then
+    vim.api.nvim_create_autocmd({ "SourceCmd" }, {
+      group = group,
+      pattern = pattern,
+      callback = function(args)
+        local bufnr = tonumber(args.buf)
+
+        local route, err = route_definitions:find(bufnr, "source")
+        if err then
+          error(err)
+        end
+
+        local ctx = require("pluginbuf.core.context").new_source_context(bufnr, route)
+        route.source(ctx)
+      end,
+    })
+  end
 end
 
 return M

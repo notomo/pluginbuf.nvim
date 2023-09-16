@@ -37,4 +37,15 @@ function WriteContext.complete(self)
   vim.bo[self._bufnr].modified = false
 end
 
+local SourceContext = {}
+SourceContext.__index = SourceContext
+
+function M.new_source_context(bufnr, route)
+  local tbl = {
+    path_params = route.path_params,
+    _bufnr = bufnr,
+  }
+  return setmetatable(tbl, SourceContext)
+end
+
 return M

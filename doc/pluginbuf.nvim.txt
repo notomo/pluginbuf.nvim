@@ -18,6 +18,7 @@ PluginbufRouteDefinition                            *PluginbufRouteDefinition*
 - {path} (string) TODO
 - {read} (fun(ctx)?) TODO
 - {write} (fun(ctx)?) TODO
+- {source} (fun(ctx)?) TODO
 
 ==============================================================================
 EXAMPLES                                             *pluginbuf.nvim-EXAMPLES*
