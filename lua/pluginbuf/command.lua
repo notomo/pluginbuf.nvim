@@ -13,7 +13,7 @@ local register_one = function(handler_type, route_definitions, event, group, pat
 
       local route, err = route_definitions:find(bufnr, handler_type)
       if err then
-        error(err)
+        error("[pluginbuf] " .. err)
       end
 
       local ctx = require("pluginbuf.core.context").new_context(handler_type, bufnr, route, autocmd_args)

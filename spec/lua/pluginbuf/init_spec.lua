@@ -111,4 +111,17 @@ line2$]])
 
     assert.equals(vim.fn.bufnr("%"), autocmd_args.buf)
   end)
+
+  it("raises error if there is no matched route", function()
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/",
+        read = function(_) end,
+      },
+    })
+
+    local ok, err = pcall(vim.cmd.edit, "pluginbuf-test://not_found/route")
+    assert.is_false(ok)
+    assert.matches("not found route", err)
+  end)
 end)
