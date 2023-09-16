@@ -7,18 +7,24 @@ register({scheme_name}, {route_definitions})            *pluginbuf.register()*
   Registers scheme handler.
 
   Parameters: ~
-    {scheme_name} (string) TODO
+    {scheme_name} (string) scheme name part in `scheme_name://path`
     {route_definitions} (PluginbufRouteDefinition[]) |PluginbufRouteDefinition|
 
 ==============================================================================
 STRUCTURE                                           *pluginbuf.nvim-STRUCTURE*
 
+PluginbufContext                                            *PluginbufContext*
+
+- {path} (string) path that is filled with path parameters
+- {path_params} (table<string,string>) resolved path parameters
+- {autocmd_args} (table<string,any>) |nvim_create_autocmd()| callback arguments.
+
 PluginbufRouteDefinition                            *PluginbufRouteDefinition*
 
-- {path} (string) TODO
-- {read} (fun(ctx)?) TODO
-- {write} (fun(ctx)?) TODO
-- {source} (fun(ctx)?) TODO
+- {path} (string) path part in `scheme_name://path`. This can include parameter by `{parameter_name}`.
+- {read} (fun(ctx:PluginbufContext)?) be invoked if buffer matches with path. related: |BufReadCmd|
+- {write} (fun(ctx:PluginbufContext)?) be invoked if buffer matches with path. related: |BufWriteCmd|
+- {source} (fun(ctx:PluginbufContext)?) be invoked if buffer matches with path. related: |SourceCmd|
 
 ==============================================================================
 EXAMPLES                                             *pluginbuf.nvim-EXAMPLES*
