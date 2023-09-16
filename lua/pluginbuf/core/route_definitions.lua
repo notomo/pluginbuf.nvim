@@ -1,10 +1,10 @@
 local Route = {}
 
-function Route.new(raw_route, path_params)
+function Route.new(raw_route_definition, path_params)
   return {
-    read = raw_route.read,
-    write = raw_route.write,
-    source = raw_route.source,
+    read = raw_route_definition.read,
+    write = raw_route_definition.write,
+    source = raw_route_definition.source,
     path_params = path_params,
   }
 end
@@ -12,21 +12,16 @@ end
 local RouteDefinition = {}
 RouteDefinition.__index = RouteDefinition
 
-function RouteDefinition.new(raw_route)
+function RouteDefinition.new(raw_route_definition)
   local tbl = {
-    _path_definitions = require("pluginbuf.core.path_definitions").new(raw_route.path),
-    _enabled_types = {
-      read = raw_route.read ~= nil,
-      write = raw_route.write ~= nil,
-      source = raw_route.source ~= nil,
-    },
-    _raw_route = raw_route,
+    _path_definitions = require("pluginbuf.core.path_definitions").new(raw_route_definition.path),
+    _raw_route_definition = raw_route_definition,
   }
   return setmetatable(tbl, RouteDefinition)
 end
 
-function RouteDefinition.match(self, path_elements, enabled_type)
-  if not self._enabled_types[enabled_type] then
+function RouteDefinition.match(self, path_elements, handler_type)
+  if not self:has(handler_type) then
     return nil
   end
 
@@ -35,21 +30,21 @@ function RouteDefinition.match(self, path_elements, enabled_type)
   end
 
   local path_params = {}
-  for i, e in ipairs(path_elements) do
+  for i, path_element in ipairs(path_elements) do
     local definition = self._path_definitions[i]
-    if not definition.is_variable and definition.name ~= e then
+    if not definition.is_variable and definition.name ~= path_element then
       return nil
     end
     if definition.is_variable then
-      path_params[definition.name] = e
+      path_params[definition.name] = path_element
     end
   end
 
-  return Route.new(self._raw_route, path_params)
+  return Route.new(self._raw_route_definition, path_params)
 end
 
-function RouteDefinition.has(self, enabled_type)
-  return self._enabled_types[enabled_type]
+function RouteDefinition.has(self, handler_type)
+  return self._raw_route_definition[handler_type] ~= nil
 end
 
 local RouteDefinitions = {}
@@ -59,29 +54,31 @@ function RouteDefinitions.new(raw_route_definitions)
   local tbl = {
     _route_definitions = vim
       .iter(raw_route_definitions)
-      :map(function(raw_route)
-        return RouteDefinition.new(raw_route)
+      :map(function(raw_route_definition)
+        return RouteDefinition.new(raw_route_definition)
       end)
       :totable(),
   }
   return setmetatable(tbl, RouteDefinitions)
 end
 
-function RouteDefinitions.find(self, bufnr, enabled_type)
+function RouteDefinitions.find(self, bufnr, handler_type)
   local path = require("pluginbuf.core.path").from_bufnr(bufnr)
   local path_elements = require("pluginbuf.core.path").to_elements(path)
+
   for _, definition in ipairs(self._route_definitions) do
-    local route = definition:match(path_elements, enabled_type)
+    local route = definition:match(path_elements, handler_type)
     if route then
       return route, nil
     end
   end
+
   return nil, "not found route for: " .. path
 end
 
-function RouteDefinitions.has(self, enabled_type)
+function RouteDefinitions.has(self, handler_type)
   return vim.iter(self._route_definitions):any(function(definition)
-    return definition:has(enabled_type)
+    return definition:has(handler_type)
   end)
 end
 

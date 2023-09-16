@@ -19,12 +19,12 @@ function M.new(path)
   local path_elements = require("pluginbuf.core.path").to_elements(path)
   return vim
     .iter(path_elements)
-    :map(function(e)
-      local matched = e:match("{([%w-_]+)}")
-      if matched then
-        return new_variable_element(matched)
+    :map(function(path_element)
+      local variable_name = path_element:match("{([%w-_]+)}")
+      if variable_name then
+        return new_variable_element(variable_name)
       end
-      return new_fixed_element(e)
+      return new_fixed_element(path_element)
     end)
     :totable()
 end
