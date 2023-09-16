@@ -4,7 +4,7 @@ function M.register(scheme_name, raw_route_definitions)
   local group = vim.api.nvim_create_augroup("pluginbuf_" .. scheme_name, {})
   local pattern = scheme_name .. "://{*,*/*}"
 
-  local route_definitions = require("pluginbuf.core.route_definitions").new(scheme_name, raw_route_definitions)
+  local route_definitions = require("pluginbuf.core.route_definitions").new(raw_route_definitions)
 
   if route_definitions:has("read") then
     vim.api.nvim_create_autocmd({ "BufReadCmd" }, {

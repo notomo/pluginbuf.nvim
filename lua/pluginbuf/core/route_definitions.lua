@@ -2,8 +2,8 @@ local Route = {}
 
 function Route.new(raw_route, path_params)
   return {
-    read = raw_route.read or function() end,
-    write = raw_route.write or function() end,
+    read = raw_route.read,
+    write = raw_route.write,
     path_params = path_params,
   }
 end
@@ -53,8 +53,7 @@ end
 local RouteDefinitions = {}
 RouteDefinitions.__index = RouteDefinitions
 
-function RouteDefinitions.new(scheme_name, raw_route_definitions)
-  local prefix_length = #scheme_name + #"://"
+function RouteDefinitions.new(raw_route_definitions)
   local tbl = {
     _route_definitions = vim
       .iter(raw_route_definitions)
@@ -62,34 +61,26 @@ function RouteDefinitions.new(scheme_name, raw_route_definitions)
         return RouteDefinition.new(raw_route)
       end)
       :totable(),
-    _to_path = function(bufnr)
-      local full_path = vim.api.nvim_buf_get_name(bufnr)
-      local path = full_path:sub(prefix_length)
-      return vim.fn.trim(path, "/", 0)
-    end,
   }
   return setmetatable(tbl, RouteDefinitions)
 end
 
 function RouteDefinitions.find(self, bufnr, enabled_type)
-  local path = self._to_path(bufnr)
-  local elements = vim.split(path, "/", { plain = true })
-  for _, def in ipairs(self._route_definitions) do
-    local route = def:match(elements, enabled_type)
+  local path = require("pluginbuf.core.path").from_bufnr(bufnr)
+  local path_elements = require("pluginbuf.core.path").to_elements(path)
+  for _, definition in ipairs(self._route_definitions) do
+    local route = definition:match(path_elements, enabled_type)
     if route then
       return route, nil
     end
   end
-  return nil, "not found route"
+  return nil, "not found route for: " .. path
 end
 
 function RouteDefinitions.has(self, enabled_type)
-  for _, def in ipairs(self._route_definitions) do
-    if def:has(enabled_type) then
-      return true
-    end
-  end
-  return false
+  return vim.iter(self._route_definitions):any(function(definition)
+    return definition:has(enabled_type)
+  end)
 end
 
 return RouteDefinitions

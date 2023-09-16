@@ -1,26 +1,30 @@
 local M = {}
 
-local PathDefinition = {}
-
-function PathDefinition.new(name, is_variable)
+local new_element = function(name, is_variable)
   return {
     name = name,
     is_variable = is_variable,
   }
 end
 
+local new_variable_element = function(name)
+  return new_element(name, true)
+end
+
+local new_fixed_element = function(name)
+  return new_element(name, false)
+end
+
 function M.new(path)
-  local normalized = vim.fn.trim(path, "/", 0)
-  local elements = vim.split(normalized, "/", { plain = true })
+  local path_elements = require("pluginbuf.core.path").to_elements(path)
   return vim
-    .iter(elements)
+    .iter(path_elements)
     :map(function(e)
       local matched = e:match("{([%w-_]+)}")
-      local is_variable = matched ~= nil
-      if not is_variable then
-        return PathDefinition.new(e, is_variable)
+      if matched then
+        return new_variable_element(matched)
       end
-      return PathDefinition.new(matched, is_variable)
+      return new_fixed_element(e)
     end)
     :totable()
 end
