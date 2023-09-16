@@ -1,10 +1,11 @@
 local Route = {}
 
-function Route.new(raw_route_definition, path_params)
+function Route.new(raw_route_definition, path, path_params)
   return {
     read = raw_route_definition.read,
     write = raw_route_definition.write,
     source = raw_route_definition.source,
+    path = path,
     path_params = path_params,
   }
 end
@@ -20,11 +21,12 @@ function RouteDefinition.new(raw_route_definition)
   return setmetatable(tbl, RouteDefinition)
 end
 
-function RouteDefinition.match(self, path_elements, handler_type)
+function RouteDefinition.match(self, path, handler_type)
   if not self:has(handler_type) then
     return nil
   end
 
+  local path_elements = require("pluginbuf.core.path").to_elements(path)
   if #path_elements ~= #self._path_definitions then
     return nil
   end
@@ -40,7 +42,7 @@ function RouteDefinition.match(self, path_elements, handler_type)
     end
   end
 
-  return Route.new(self._raw_route_definition, path_params)
+  return Route.new(self._raw_route_definition, path, path_params)
 end
 
 function RouteDefinition.has(self, handler_type)
@@ -64,10 +66,9 @@ end
 
 function RouteDefinitions.find(self, bufnr, handler_type)
   local path = require("pluginbuf.core.path").from_bufnr(bufnr)
-  local path_elements = require("pluginbuf.core.path").to_elements(path)
 
   for _, definition in ipairs(self._route_definitions) do
-    local route = definition:match(path_elements, handler_type)
+    local route = definition:match(path, handler_type)
     if route then
       return route, nil
     end

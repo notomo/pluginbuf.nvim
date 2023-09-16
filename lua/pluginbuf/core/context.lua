@@ -16,6 +16,7 @@ local mapping = {
 }
 function M.new_context(handler_type, bufnr, route, autocmd_args)
   local tbl = {
+    path = route.path,
     path_params = route.path_params,
     autocmd_args = autocmd_args,
     _bufnr = bufnr,

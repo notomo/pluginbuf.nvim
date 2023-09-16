@@ -80,6 +80,22 @@ line2$]])
     }, path_params)
   end)
 
+  it("can use path that is filled with path parameters", function()
+    local path
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/{param1}/{param2}",
+        read = function(ctx)
+          path = ctx.path
+        end,
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test://test/test1/test2")
+
+    assert.equals("test/test1/test2", path)
+  end)
+
   it("can use autocmd arguments", function()
     local autocmd_args
     pluginbuf.register("pluginbuf-test", {
