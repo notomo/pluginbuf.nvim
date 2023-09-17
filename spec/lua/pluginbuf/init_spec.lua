@@ -80,6 +80,30 @@ line2$]])
     }, path_params)
   end)
 
+  it("can use query parameter", function()
+    local query_params
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test",
+        query_params = {
+          param2 = "test2_default",
+          param3 = "test3_default",
+        },
+        read = function(ctx)
+          query_params = ctx.query_params
+        end,
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test://test?param1=test1&param2=test2")
+
+    assert.is_same({
+      param1 = "test1",
+      param2 = "test2",
+      param3 = "test3_default",
+    }, query_params)
+  end)
+
   it("can use path that is filled with path parameters", function()
     local path
     pluginbuf.register("pluginbuf-test", {

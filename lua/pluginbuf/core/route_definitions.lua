@@ -1,12 +1,13 @@
 local Route = {}
 
-function Route.new(raw_route_definition, path, path_params)
+function Route.new(raw_route_definition, path, path_params, query_params)
   return {
     read = raw_route_definition.read,
     write = raw_route_definition.write,
     source = raw_route_definition.source,
     path = path,
     path_params = path_params,
+    query_params = vim.tbl_deep_extend("force", raw_route_definition.query_params or {}, query_params),
   }
 end
 
@@ -21,7 +22,7 @@ function RouteDefinition.new(raw_route_definition)
   return setmetatable(tbl, RouteDefinition)
 end
 
-function RouteDefinition.match(self, path, handler_type)
+function RouteDefinition.match(self, handler_type, path, query_params)
   if not self:has(handler_type) then
     return nil
   end
@@ -42,7 +43,7 @@ function RouteDefinition.match(self, path, handler_type)
     end
   end
 
-  return Route.new(self._raw_route_definition, path, path_params)
+  return Route.new(self._raw_route_definition, path, path_params, query_params)
 end
 
 function RouteDefinition.has(self, handler_type)
@@ -65,10 +66,10 @@ function RouteDefinitions.new(raw_route_definitions)
 end
 
 function RouteDefinitions.find(self, bufnr, handler_type)
-  local path = require("pluginbuf.core.path").from_bufnr(bufnr)
+  local path, query_params = require("pluginbuf.core.path").from_bufnr(bufnr)
 
   for _, definition in ipairs(self._route_definitions) do
-    local route = definition:match(path, handler_type)
+    local route = definition:match(handler_type, path, query_params)
     if route then
       return route, nil
     end
