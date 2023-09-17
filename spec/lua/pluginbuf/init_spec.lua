@@ -10,9 +10,10 @@ describe("pluginbuf.register()", function()
       {
         path = "/test/",
         read = function(ctx)
-          ctx:set_content([[
-line1
-line2]])
+          vim.api.nvim_buf_set_lines(ctx.bufnr, 0, -1, false, {
+            "line1",
+            "line2",
+          })
         end,
       },
     })
@@ -25,12 +26,12 @@ line2$]])
   end)
 
   it("can custom buffer writing", function()
-    local content
+    local lines
     pluginbuf.register("pluginbuf-test", {
       {
         path = "/test/",
         write = function(ctx)
-          content = ctx:content()
+          lines = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, -1, false)
           ctx:complete()
         end,
       },
@@ -40,7 +41,7 @@ line2$]])
     helper.set_lines("line")
     vim.cmd.write()
 
-    assert.is_same("line", content)
+    assert.is_same({ "line" }, lines)
     assert.is_false(vim.bo.modified)
   end)
 
@@ -147,5 +148,51 @@ line2$]])
     local ok, err = pcall(vim.cmd.edit, "pluginbuf-test://not_found/route")
     assert.is_false(ok)
     assert.matches("not found route", err)
+  end)
+end)
+
+describe("cmd util", function()
+  before_each(helper.before_each)
+  after_each(helper.after_each)
+
+  it("can use command output for reading", function()
+    local on_finished = helper.on_finished()
+
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/",
+        read = require("pluginbuf.util").cmd_output({ "echo", "output" }, { done = on_finished }),
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test://test")
+    on_finished.wait()
+
+    assert.exists_pattern([[
+^output$]])
+  end)
+
+  it("can use buffer content as command input", function()
+    local stdout
+    local on_finished = helper.on_finished()
+
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/",
+        write = require("pluginbuf.util").cmd_input({ "echo", "-n", "-" }, {
+          done = function(o)
+            stdout = o.stdout
+            on_finished()
+          end,
+        }),
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test://test")
+    helper.set_lines("line")
+    vim.cmd.write()
+    on_finished.wait()
+
+    assert.equals("line", stdout)
   end)
 end)

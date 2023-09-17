@@ -20,24 +20,13 @@ function M.new_context(handler_type, bufnr, route, autocmd_args)
     path_params = route.path_params,
     query_params = route.query_params,
     autocmd_args = autocmd_args,
-    _bufnr = bufnr,
+    bufnr = bufnr,
   }
   return setmetatable(tbl, mapping[handler_type])
 end
 
-function ReadContext.set_content(self, text)
-  local lines = vim.split(text, "\n", { plain = true })
-  vim.api.nvim_buf_set_lines(self._bufnr, 0, -1, false, lines)
-  vim.bo[self._bufnr].modified = false
-end
-
-function WriteContext.content(self)
-  local lines = vim.api.nvim_buf_get_lines(self._bufnr, 0, -1, false)
-  return table.concat(lines, "\n")
-end
-
 function WriteContext.complete(self)
-  vim.bo[self._bufnr].modified = false
+  vim.bo[self.bufnr].modified = false
 end
 
 return M
