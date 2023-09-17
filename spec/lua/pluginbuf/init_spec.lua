@@ -137,6 +137,28 @@ line2$]])
     assert.equals(vim.fn.bufnr("%"), autocmd_args.buf)
   end)
 
+  it("can use multiple routes", function()
+    local called = false
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/1",
+        read = function(_)
+          error("should not be called")
+        end,
+      },
+      {
+        path = "/test/2",
+        read = function(_)
+          called = true
+        end,
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test://test/2")
+
+    assert.is_true(called)
+  end)
+
   it("raises error if there is no matched route", function()
     pluginbuf.register("pluginbuf-test", {
       {
