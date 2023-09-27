@@ -1,7 +1,7 @@
 local M = {}
 
-local normalize = function(path)
-  return vim.fn.trim(path, "/", 0)
+local trim_trailing_slash = function(path)
+  return vim.fn.trim(path, "/", 2)
 end
 
 local parse_query = function(raw_query)
@@ -22,14 +22,14 @@ local parse_query = function(raw_query)
 end
 
 function M.to_elements(path)
-  local normalized_path = normalize(path)
-  return vim.split(normalized_path, "/", { plain = true })
+  local trimmed_path = trim_trailing_slash(path)
+  return vim.split(trimmed_path, "/", { plain = true })
 end
 
 function M.from_bufnr(bufnr)
   local full_path = vim.api.nvim_buf_get_name(bufnr)
   local scheme_index = full_path:find("://")
-  local path = full_path:sub(scheme_index + 1)
+  local path = full_path:sub(scheme_index + 3)
 
   local query_index = path:find("?")
   local query_params = {}
@@ -39,7 +39,8 @@ function M.from_bufnr(bufnr)
     path = path:sub(1, query_index - 1)
   end
 
-  return normalize(path), query_params
+  local trimmed_path = trim_trailing_slash(path)
+  return trimmed_path, query_params
 end
 
 return M

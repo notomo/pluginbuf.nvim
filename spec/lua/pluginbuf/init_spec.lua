@@ -18,7 +18,7 @@ describe("pluginbuf.register()", function()
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test")
+    vim.cmd.edit("pluginbuf-test:///test")
 
     assert.exists_pattern([[
 ^line1
@@ -37,7 +37,7 @@ line2$]])
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test")
+    vim.cmd.edit("pluginbuf-test:///test")
     helper.set_lines("line")
     vim.cmd.write()
 
@@ -56,7 +56,7 @@ line2$]])
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test")
+    vim.cmd.edit("pluginbuf-test:///test")
     vim.cmd.source("%")
 
     assert.is_true(called)
@@ -73,7 +73,7 @@ line2$]])
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test/test1/test2")
+    vim.cmd.edit("pluginbuf-test:///test/test1/test2")
 
     assert.is_same({
       param1 = "test1",
@@ -96,7 +96,7 @@ line2$]])
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test?param1=test1&param2=test2")
+    vim.cmd.edit("pluginbuf-test:///test?param1=test1&param2=test2")
 
     assert.is_same({
       param1 = "test1",
@@ -116,9 +116,9 @@ line2$]])
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test/test1/test2")
+    vim.cmd.edit("pluginbuf-test:///test/test1/test2")
 
-    assert.equals("test/test1/test2", path)
+    assert.equals("/test/test1/test2", path)
   end)
 
   it("can use autocmd arguments", function()
@@ -132,7 +132,7 @@ line2$]])
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test")
+    vim.cmd.edit("pluginbuf-test:///test")
 
     assert.equals(vim.fn.bufnr("%"), autocmd_args.buf)
   end)
@@ -154,7 +154,7 @@ line2$]])
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test/2")
+    vim.cmd.edit("pluginbuf-test:///test/2")
 
     assert.is_true(called)
   end)
@@ -167,7 +167,7 @@ line2$]])
       },
     })
 
-    local ok, err = pcall(vim.cmd.edit, "pluginbuf-test://not_found/route")
+    local ok, err = pcall(vim.cmd.edit, "pluginbuf-test:///not_found/route")
     assert.is_false(ok)
     assert.matches("not found route", err)
   end)
@@ -187,7 +187,7 @@ describe("cmd util", function()
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test")
+    vim.cmd.edit("pluginbuf-test:///test")
     on_finished.wait()
 
     assert.exists_pattern([[
@@ -210,7 +210,7 @@ describe("cmd util", function()
       },
     })
 
-    vim.cmd.edit("pluginbuf-test://test")
+    vim.cmd.edit("pluginbuf-test:///test")
     helper.set_lines("line")
     vim.cmd.write()
     on_finished.wait()
