@@ -218,3 +218,22 @@ describe("cmd util", function()
     assert.equals("line", stdout)
   end)
 end)
+
+describe("pluginbuf.unregister()", function()
+  before_each(helper.before_each)
+  after_each(helper.after_each)
+
+  it("unregisters scheme handlers", function()
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/",
+        read = function(ctx)
+          error("should not be called")
+        end,
+      },
+    })
+    pluginbuf.unregister("pluginbuf-test")
+
+    vim.cmd.edit("pluginbuf-test:///test")
+  end)
+end)

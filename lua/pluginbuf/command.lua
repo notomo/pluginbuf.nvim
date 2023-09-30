@@ -24,8 +24,13 @@ local register_one = function(handler_type, route_definitions, event, group, pat
   })
 end
 
+local to_group_name = function(scheme_name)
+  return "pluginbuf_" .. scheme_name
+end
+
 function M.register(scheme_name, raw_route_definitions)
-  local group = vim.api.nvim_create_augroup("pluginbuf_" .. scheme_name, {})
+  local group_name = to_group_name(scheme_name)
+  local group = vim.api.nvim_create_augroup(group_name, {})
   local pattern = scheme_name .. "://{*,*/*}"
 
   local route_definitions = require("pluginbuf.core.route_definitions").new(raw_route_definitions)
@@ -33,6 +38,11 @@ function M.register(scheme_name, raw_route_definitions)
   register_one("read", route_definitions, "BufReadCmd", group, pattern)
   register_one("write", route_definitions, "BufWriteCmd", group, pattern)
   register_one("source", route_definitions, "SourceCmd", group, pattern)
+end
+
+function M.unregister(scheme_name)
+  local group_name = to_group_name(scheme_name)
+  vim.api.nvim_clear_autocmds({ group = group_name })
 end
 
 return M

@@ -10,6 +10,12 @@ register({scheme_name}, {route_definitions})            *pluginbuf.register()*
     {scheme_name} (string) scheme name part in `scheme_name://path?query`
     {route_definitions} (PluginbufRouteDefinition[]) |PluginbufRouteDefinition|
 
+unregister({scheme_name})                             *pluginbuf.unregister()*
+  Unregisters scheme handler.
+
+  Parameters: ~
+    {scheme_name} (string) scheme name part in `scheme_name://path?query`
+
 ==============================================================================
 STRUCTURE                                           *pluginbuf.nvim-STRUCTURE*
 

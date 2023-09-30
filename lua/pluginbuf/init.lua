@@ -20,4 +20,10 @@ function M.register(scheme_name, route_definitions)
   require("pluginbuf.command").register(scheme_name, route_definitions)
 end
 
+--- Unregisters scheme handler.
+--- @param scheme_name string scheme name part in `scheme_name://path?query`
+function M.unregister(scheme_name)
+  require("pluginbuf.command").unregister(scheme_name)
+end
+
 return M
