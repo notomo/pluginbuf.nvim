@@ -183,7 +183,7 @@ describe("cmd util", function()
     pluginbuf.register("pluginbuf-test", {
       {
         path = "/test/",
-        read = require("pluginbuf.util").cmd_output({ "echo", "output" }, { done = on_finished }),
+        read = require("pluginbuf.util").cmd_output({ "echo", "output" }, { callback = on_finished }),
       },
     })
 
@@ -202,7 +202,7 @@ describe("cmd util", function()
       {
         path = "/test/",
         write = require("pluginbuf.util").cmd_input({ "echo", "-n", "-" }, {
-          done = function(o)
+          callback = function(o)
             stdout = o.stdout
             on_finished()
           end,

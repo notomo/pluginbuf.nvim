@@ -2,7 +2,7 @@ local M = {}
 
 function M.cmd_output(cmd, opts)
   opts = opts or {}
-  opts.done = opts.done or function(_) end
+  opts.callback = opts.callback or function(_) end
   opts.text = true
   return function(ctx)
     vim.system(
@@ -11,13 +11,14 @@ function M.cmd_output(cmd, opts)
       vim.schedule_wrap(function(o)
         if o.code ~= 0 then
           vim.notify("[pluginbuf] " .. o.stderr, vim.log.levels.ERROR)
+          opts.callback(o)
           return
         end
 
         local lines = vim.split(o.stdout, "\n", { plain = true })
         vim.api.nvim_buf_set_lines(ctx.bufnr, 0, -1, false, lines)
         vim.bo[ctx.bufnr].modified = false
-        opts.done(o)
+        opts.callback(o)
       end)
     )
   end
@@ -25,7 +26,7 @@ end
 
 function M.cmd_input(cmd, opts)
   opts = opts or {}
-  opts.done = opts.done or function(_) end
+  opts.callback = opts.callback or function(_) end
   opts.text = true
   return function(ctx)
     local lines = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, -1, false)
@@ -51,10 +52,12 @@ function M.cmd_input(cmd, opts)
       vim.schedule_wrap(function(o)
         if o.code ~= 0 then
           vim.notify("[pluginbuf] " .. o.stderr, vim.log.levels.ERROR)
+          opts.callback(o)
           return
         end
+
         vim.bo[ctx.bufnr].modified = false
-        opts.done(o)
+        opts.callback(o)
       end)
     )
   end
