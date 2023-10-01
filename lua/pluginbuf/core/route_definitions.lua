@@ -16,7 +16,10 @@ RouteDefinition.__index = RouteDefinition
 
 function RouteDefinition.new(raw_route_definition)
   local tbl = {
-    _path_definitions = require("pluginbuf.core.path_definitions").new(raw_route_definition.path),
+    _path_definitions = require("pluginbuf.core.path_definitions").new(
+      raw_route_definition.path,
+      raw_route_definition.path_params
+    ),
     _raw_route_definition = raw_route_definition,
   }
   return setmetatable(tbl, RouteDefinition)
@@ -34,7 +37,8 @@ function RouteDefinition.match(self, handler_type, path_elements)
   local path_params = {}
   for i, path_element in ipairs(path_elements) do
     local definition = self._path_definitions[i]
-    if not definition.is_variable and definition.name ~= path_element then
+    local matched = definition.match(path_element)
+    if not matched then
       return nil
     end
     if definition.is_variable then

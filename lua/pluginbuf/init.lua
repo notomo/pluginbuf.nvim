@@ -8,6 +8,7 @@ local M = {}
 
 --- @class PluginbufRouteDefinition
 --- @field path string path part in `scheme_name://path?query`. This can include parameter by `{parameter_name}`.
+--- @field path_params table<string,string>? path parameter to vim regex pattern mapping.
 --- @field query_params table<string,any>? default query parameters
 --- @field read fun(ctx:PluginbufContext)?  be invoked if buffer matches with path. related: |BufReadCmd|
 --- @field write fun(ctx:PluginbufContext)? be invoked if buffer matches with path. related: |BufWriteCmd|

@@ -81,6 +81,37 @@ line2$]])
     }, path_params)
   end)
 
+  it("can validate path parameter pattern", function()
+    local path_params
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = "/test/{param1}/{param2}",
+        path_params = {
+          param1 = [[\v^\w+$]],
+        },
+        read = function(ctx)
+          path_params = ctx.path_params
+        end,
+      },
+      {
+        path = "/test/{param1}/{param2}",
+        path_params = {
+          param1 = [[\v^\d+$]],
+        },
+        read = function(_)
+          error("should not be called")
+        end,
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test:///test/123/test2")
+
+    assert.is_same({
+      param1 = "123",
+      param2 = "test2",
+    }, path_params)
+  end)
+
   it("can use query parameter", function()
     local query_params
     pluginbuf.register("pluginbuf-test", {

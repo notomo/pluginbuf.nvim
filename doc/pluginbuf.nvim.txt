@@ -29,6 +29,7 @@ PluginbufContext                                            *PluginbufContext*
 PluginbufRouteDefinition                            *PluginbufRouteDefinition*
 
 - {path} (string) path part in `scheme_name://path?query`. This can include parameter by `{parameter_name}`.
+- {path_params} (table<string,string>?) path parameter to vim regex pattern mapping.
 - {query_params} (table<string,any>?) default query parameters
 - {read} (fun(ctx:PluginbufContext)?) be invoked if buffer matches with path. related: |BufReadCmd|
 - {write} (fun(ctx:PluginbufContext)?) be invoked if buffer matches with path. related: |BufWriteCmd|
