@@ -1,3 +1,5 @@
+local vim = vim
+
 local M = {}
 
 local trim_trailing_slash = function(path)
@@ -24,6 +26,15 @@ end
 function M.to_elements(path)
   local trimmed_path = trim_trailing_slash(path)
   return vim.split(trimmed_path, "/", { plain = true })
+end
+
+function M.parse_path_element(path_element)
+  local variable_name = path_element:match("{([%w-_]+)}")
+  local is_variable = variable_name ~= nil
+  if is_variable then
+    return variable_name, true
+  end
+  return path_element, false
 end
 
 function M.from_bufnr(bufnr)

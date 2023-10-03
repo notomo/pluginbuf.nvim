@@ -63,4 +63,30 @@ function M.cmd_input(cmd, opts)
   end
 end
 
+function M.path(path)
+  local capture_index = 1
+  local params = {}
+  local path_patterns = vim
+    .iter(require("pluginbuf.core.path").to_elements(path))
+    :map(function(path_element)
+      local name, is_variable = require("pluginbuf.core.path").parse_path_element(path_element)
+      if not is_variable then
+        return name
+      end
+
+      params[name] = capture_index
+      capture_index = capture_index + 1
+
+      return "([^/]+)"
+    end)
+    :totable()
+
+  local pattern = [[\v^]] .. table.concat(path_patterns, "/") .. "$"
+
+  return {
+    pattern = pattern,
+    params = params,
+  }
+end
+
 return M

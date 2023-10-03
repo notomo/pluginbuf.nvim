@@ -1,3 +1,5 @@
+local vim = vim
+
 local Route = {}
 
 function Route.new(raw_route_definition, path, path_params, query_params)
@@ -16,37 +18,23 @@ RouteDefinition.__index = RouteDefinition
 
 function RouteDefinition.new(raw_route_definition)
   local tbl = {
-    _path_definitions = require("pluginbuf.core.path_definitions").new(
-      raw_route_definition.path,
-      raw_route_definition.path_params
-    ),
+    _path_definitions = require("pluginbuf.core.path_definitions").new(raw_route_definition.path),
     _raw_route_definition = raw_route_definition,
   }
   return setmetatable(tbl, RouteDefinition)
 end
 
-function RouteDefinition.match(self, handler_type, path_elements)
+function RouteDefinition.match(self, handler_type, path)
   if not self:has(handler_type) then
     return nil
   end
 
-  if #path_elements ~= #self._path_definitions then
+  local path_params = self._path_definitions:match(path)
+  if not path_params then
     return nil
   end
 
-  local path_params = {}
-  for i, path_element in ipairs(path_elements) do
-    local definition = self._path_definitions[i]
-    local matched = definition.match(path_element)
-    if not matched then
-      return nil
-    end
-    if definition.is_variable then
-      path_params[definition.name] = path_element
-    end
-  end
-
-  return function(path, query_params)
+  return function(query_params)
     return Route.new(self._raw_route_definition, path, path_params, query_params)
   end
 end
@@ -72,12 +60,11 @@ end
 
 function RouteDefinitions.find(self, bufnr, handler_type)
   local path, query_params = require("pluginbuf.core.path").from_bufnr(bufnr)
-  local path_elements = require("pluginbuf.core.path").to_elements(path)
 
   for _, definition in ipairs(self._route_definitions) do
-    local route_factory = definition:match(handler_type, path_elements)
+    local route_factory = definition:match(handler_type, path)
     if route_factory then
-      return route_factory(path, query_params), nil
+      return route_factory(query_params), nil
     end
   end
 

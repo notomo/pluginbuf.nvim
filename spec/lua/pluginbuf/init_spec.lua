@@ -8,7 +8,7 @@ describe("pluginbuf.register()", function()
   it("can custom buffer reading", function()
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
+        path = require("pluginbuf.util").path("/test/"),
         read = function(ctx)
           vim.api.nvim_buf_set_lines(ctx.bufnr, 0, -1, false, {
             "line1",
@@ -29,7 +29,7 @@ line2$]])
     local lines
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
+        path = require("pluginbuf.util").path("/test/"),
         write = function(ctx)
           lines = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, -1, false)
           ctx:complete()
@@ -49,7 +49,7 @@ line2$]])
     local called = false
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
+        path = require("pluginbuf.util").path("/test/"),
         source = function(_)
           called = true
         end,
@@ -66,7 +66,7 @@ line2$]])
     local path_params
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/{param1}/{param2}",
+        path = require("pluginbuf.util").path("/test/{param1}/{param2}"),
         read = function(ctx)
           path_params = ctx.path_params
         end,
@@ -85,21 +85,27 @@ line2$]])
     local path_params
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/{param1}/{param2}",
-        path_params = {
-          param1 = [[\v^\w+$]],
-        },
-        read = function(ctx)
-          path_params = ctx.path_params
-        end,
-      },
-      {
-        path = "/test/{param1}/{param2}",
-        path_params = {
-          param1 = [[\v^\d+$]],
+        path = {
+          pattern = [[\v^/test/([a-z]+)/([^/]+)$]],
+          params = {
+            param1 = 1,
+            param2 = 2,
+          },
         },
         read = function(_)
           error("should not be called")
+        end,
+      },
+      {
+        path = {
+          pattern = [[\v^/test/(\d+)/([^/]+)$]],
+          params = {
+            param1 = 1,
+            param2 = 2,
+          },
+        },
+        read = function(ctx)
+          path_params = ctx.path_params
         end,
       },
     })
@@ -112,11 +118,34 @@ line2$]])
     }, path_params)
   end)
 
+  it("can use custom path pattern", function()
+    local path_params
+    pluginbuf.register("pluginbuf-test", {
+      {
+        path = {
+          pattern = [[\v^(.+)$]],
+          params = {
+            all = 1,
+          },
+        },
+        read = function(ctx)
+          path_params = ctx.path_params
+        end,
+      },
+    })
+
+    vim.cmd.edit("pluginbuf-test:///test/123/test2")
+
+    assert.is_same({
+      all = "/test/123/test2",
+    }, path_params)
+  end)
+
   it("can use query parameter", function()
     local query_params
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test",
+        path = require("pluginbuf.util").path("/test"),
         query_params = {
           param2 = "test2_default",
           param3 = "test3_default",
@@ -140,7 +169,7 @@ line2$]])
     local path
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/{param1}/{param2}",
+        path = require("pluginbuf.util").path("/test/{param1}/{param2}"),
         read = function(ctx)
           path = ctx.path
         end,
@@ -156,7 +185,7 @@ line2$]])
     local autocmd_args
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
+        path = require("pluginbuf.util").path("/test/"),
         read = function(ctx)
           autocmd_args = ctx.autocmd_args
         end,
@@ -172,13 +201,13 @@ line2$]])
     local called = false
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/1",
+        path = require("pluginbuf.util").path("/test/1"),
         read = function(_)
           error("should not be called")
         end,
       },
       {
-        path = "/test/2",
+        path = require("pluginbuf.util").path("/test/2"),
         read = function(_)
           called = true
         end,
@@ -193,7 +222,7 @@ line2$]])
   it("raises error if there is no matched route", function()
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
+        path = require("pluginbuf.util").path("/test/"),
         read = function(_) end,
       },
     })
@@ -213,7 +242,7 @@ describe("cmd util", function()
 
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
+        path = require("pluginbuf.util").path("/test/"),
         read = require("pluginbuf.util").cmd_output({ "echo", "output" }, { callback = on_finished }),
       },
     })
@@ -231,7 +260,7 @@ describe("cmd util", function()
 
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
+        path = require("pluginbuf.util").path("/test/"),
         write = require("pluginbuf.util").cmd_input({ "echo", "-n", "-" }, {
           callback = function(o)
             stdout = o.stdout
@@ -257,8 +286,8 @@ describe("pluginbuf.unregister()", function()
   it("unregisters scheme handlers", function()
     pluginbuf.register("pluginbuf-test", {
       {
-        path = "/test/",
-        read = function(ctx)
+        path = require("pluginbuf.util").path("/test/"),
+        read = function(_)
           error("should not be called")
         end,
       },

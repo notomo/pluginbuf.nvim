@@ -2,17 +2,19 @@ local M = {}
 
 --- @class PluginbufContext
 --- @field path string path that is filled with path parameters
---- @field path_params table<string,string> resolved path parameters
 --- @field query_params table<string,any> resolved query parameters
 --- @field autocmd_args table<string,any>: |nvim_create_autocmd()| callback arguments.
 
 --- @class PluginbufRouteDefinition
---- @field path string path part in `scheme_name://path?query`. This can include parameter by `{parameter_name}`.
---- @field path_params table<string,string>? path parameter to vim regex pattern mapping.
+--- @field path PluginbufPathDefinition |PluginbufPathDefinition|
 --- @field query_params table<string,any>? default query parameters
 --- @field read fun(ctx:PluginbufContext)?  be invoked if buffer matches with path. related: |BufReadCmd|
 --- @field write fun(ctx:PluginbufContext)? be invoked if buffer matches with path. related: |BufWriteCmd|
 --- @field source fun(ctx:PluginbufContext)? be invoked if buffer matches with path. related: |SourceCmd|
+
+--- @class PluginbufPathDefinition
+--- @field pattern string vim regex to match with path
+--- @field params table<string,integer>? path parameter name to submatch capture indicies (ref. |\1|)
 
 --- Registers scheme handler.
 --- @param scheme_name string scheme name part in `scheme_name://path?query`
