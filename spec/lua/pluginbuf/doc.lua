@@ -50,8 +50,6 @@ Inspired by [vim-metarw](https://github.com/kana/vim-metarw).
 ```lua
 %s```]]):format(full_plugin_name, example)
 
-  local readme = io.open("README.md", "w")
-  readme:write(content)
-  readme:close()
+  util.write("README.md", content)
 end
 gen_readme()
