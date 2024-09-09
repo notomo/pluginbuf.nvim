@@ -1,5 +1,6 @@
 local helper = require("pluginbuf.test.helper")
 local pluginbuf = helper.require("pluginbuf")
+local assert = require("assertlib").typed(assert)
 
 describe("pluginbuf.register()", function()
   before_each(helper.before_each)
@@ -41,7 +42,7 @@ line2$]])
     helper.set_lines("line")
     vim.cmd.write()
 
-    assert.is_same({ "line" }, lines)
+    assert.same({ "line" }, lines)
     assert.is_false(vim.bo.modified)
   end)
 
@@ -75,7 +76,7 @@ line2$]])
 
     vim.cmd.edit("pluginbuf-test:///test/test1/test2")
 
-    assert.is_same({
+    assert.same({
       param1 = "test1",
       param2 = "test2",
     }, path_params)
@@ -112,7 +113,7 @@ line2$]])
 
     vim.cmd.edit("pluginbuf-test:///test/123/test2")
 
-    assert.is_same({
+    assert.same({
       param1 = "123",
       param2 = "test2",
     }, path_params)
@@ -136,7 +137,7 @@ line2$]])
 
     vim.cmd.edit("pluginbuf-test:///test/123/test2")
 
-    assert.is_same({
+    assert.same({
       all = "/test/123/test2",
     }, path_params)
   end)
@@ -158,7 +159,7 @@ line2$]])
 
     vim.cmd.edit("pluginbuf-test:///test?param1=test1&param2=test2")
 
-    assert.is_same({
+    assert.same({
       param1 = "test1",
       param2 = "test2",
       param3 = "test3_default",
@@ -178,7 +179,7 @@ line2$]])
 
     vim.cmd.edit("pluginbuf-test:///test/test1/test2")
 
-    assert.equals("/test/test1/test2", path)
+    assert.equal("/test/test1/test2", path)
   end)
 
   it("can use autocmd arguments", function()
@@ -194,7 +195,7 @@ line2$]])
 
     vim.cmd.edit("pluginbuf-test:///test")
 
-    assert.equals(vim.fn.bufnr("%"), autocmd_args.buf)
+    assert.equal(vim.fn.bufnr("%"), autocmd_args.buf)
   end)
 
   it("can use multiple routes", function()
@@ -229,7 +230,7 @@ line2$]])
 
     local ok, err = pcall(vim.cmd.edit, "pluginbuf-test:///not_found/route")
     assert.is_false(ok)
-    assert.matches("not found route", err)
+    assert.match("not found route", err)
   end)
 end)
 
@@ -275,7 +276,7 @@ describe("cmd util", function()
     vim.cmd.write()
     on_finished.wait()
 
-    assert.equals("line", stdout)
+    assert.equal("line", stdout)
   end)
 end)
 
