@@ -2,6 +2,7 @@ local M = {}
 
 --- @class PluginbufContext
 --- @field path string path that is filled with path parameters
+--- @field path_params table<string,any> resolved path parameters
 --- @field query_params table<string,any> resolved query parameters
 --- @field autocmd_args table<string,any>: |nvim_create_autocmd()| callback arguments.
 

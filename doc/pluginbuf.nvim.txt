@@ -22,6 +22,7 @@ STRUCTURE                                           *pluginbuf.nvim-STRUCTURE*
 PluginbufContext                                            *PluginbufContext*
 
 - {path} (string) path that is filled with path parameters
+- {path_params} (table<string,any>) resolved path parameters
 - {query_params} (table<string,any>) resolved query parameters
 - {autocmd_args} (table<string,any>) |nvim_create_autocmd()| callback arguments.
 
